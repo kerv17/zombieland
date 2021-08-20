@@ -1,0 +1,266 @@
+[gd_scene load_steps=18 format=2]
+
+[ext_resource path="res://Characters/sprite/Zombie2.png" type="Texture" id=1]
+[ext_resource path="res://Characters/sprite/Zombie.png" type="Texture" id=2]
+[ext_resource path="res://Characters/sprite/Zombie3.png" type="Texture" id=3]
+[ext_resource path="res://Characters/sprite/zombiepink2.png" type="Texture" id=4]
+[ext_resource path="res://Characters/sprite/zombiepink.png" type="Texture" id=5]
+[ext_resource path="res://Characters/sprite/zombiepink3.png" type="Texture" id=6]
+[ext_resource path="res://Characters/sprite/zombieorange3.png" type="Texture" id=7]
+[ext_resource path="res://Characters/sprite/zombieorange.png" type="Texture" id=8]
+[ext_resource path="res://Characters/sprite/zombieorange2.png" type="Texture" id=9]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends KinematicBody2D
+var found = false
+var speed = 250
+var health = 150
+var direction = 1
+var target =''
+var victim
+var victim_path
+var Move = Vector2()
+var s =0
+var t = false
+var nav
+
+signal killed
+
+func _ready():
+	set_process(true)
+	#add_collision_exception_with(nav.get_node(\"TileMap\"))
+	self.connect(\"killed\",get_parent().get_parent().get_child(5).get_node(\"CanvasLayer\"),\"on_kill\")
+	pass
+
+func _process(delta):
+	check_health()
+	var body = get_node(\"enemybody\").get_overlapping_bodies()
+	var closest_body
+	var closest_dist = INF;
+	if true:
+		for i in body:
+			if i.is_in_group(target):
+				var this_dist = position.distance_to(i.position)
+				if this_dist < closest_dist and this_dist!= 0:
+					closest_dist = this_dist
+					closest_body = i
+
+				victim = closest_body
+				if victim == null:
+					found =false
+				else:
+					victim_path = victim.get_path()
+				found = true
+
+		
+	if found ==true and victim != null:
+		if has_node(victim_path):
+			var path = nav.get_simple_path(position, victim.position, false)
+			if path.size() >= 1:
+				Move = -(position-path[1])
+				var d = position.distance_to(path[1])
+				
+				if d < 0.05:
+					path.remove(0)
+				
+			look_at(path[1])
+			get_node(\"CollisionShape2D\").global_rotation =0
+	else:
+		found = false
+	
+	Move = Move.normalized() * speed * delta * direction * autoload.game_speed
+	Move = move_and_slide(Move)
+	pass
+
+func _on_Area2D_body_enter( body ):
+	if target == \"Zombie\":
+		if body.is_in_group(\"Zombie\") and body != self:
+			body.health -= 200
+			victim =null
+
+	elif target == \"player\" and get_node(\"Timer 3\").time_left == 0:
+		if body.is_in_group(\"player\") and direction >= 0:
+			randomize()
+			body.health -= (randi() % 10 + 10)
+			get_node(\"Timer 3\").start()
+			get_node(\"Area2D\").monitoring = false
+	pass # replace with function body
+
+
+func _on_Timer_timeout():
+	target = \"player\"
+	pass # replace with function body
+
+func check_health():
+	if health <= 0 and target != 'Zombie':
+		emit_signal(\"killed\")
+		queue_free()
+	get_node(\"RichTextLabel\").set_bbcode(str(health))
+	if direction > 0:
+		get_node(\"Sprite\").set_flip_h(false)
+	if direction < 0:
+		get_node(\"Sprite\").set_flip_h(true)
+
+
+
+
+
+func _on_Timer_2_timeout():
+	direction = 1
+	health = 150
+	get_node(\"ColorRect\").visible = true
+	get_node(\"Sprite\").play(\"default\")
+	if target != \"player\":
+		emit_signal(\"killed\")
+		queue_free()
+	pass # replace with function body
+
+
+func _on_Timer_3_timeout():
+	get_node(\"Area2D\").monitoring = true
+	var hit = get_node(\"Area2D\").get_overlapping_bodies()
+	for i in hit:
+		if i.is_in_group(target) and direction > 0:
+			if target == 'player':
+				randomize()
+				i.health -= (randi() % 10 + 10)
+				get_node(\"Area2D\").monitoring = false
+				get_node(\"Timer 3\").start()
+			elif target == 'Zombie':
+				i.health -= 200
+			get_node(\"Timer 3\").start()
+	pass # replace with function body
+"
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 1039.33
+
+[sub_resource type="CircleShape2D" id=3]
+radius = 407.953
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 26.669, 24.7893 )
+
+[sub_resource type="RectangleShape2D" id=5]
+extents = Vector2( 13.6511, 22.9298 )
+
+[sub_resource type="CircleShape2D" id=6]
+radius = 38.6427
+
+[sub_resource type="SpriteFrames" id=7]
+animations = [ {
+"frames": [ ExtResource( 1 ), ExtResource( 2 ), ExtResource( 3 ), ExtResource( 2 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 5 ) ],
+"loop": true,
+"name": "love",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 8 ) ],
+"loop": true,
+"name": "Fear",
+"speed": 5.0
+} ]
+
+[sub_resource type="GDScript" id=8]
+script/source = "extends ColorRect
+
+# class member variables go here, for example:
+# var a = 2
+# var b = \"textvar\"
+
+func _ready():
+	# Called when the node is added to the scene for the first time.
+	set_process(true)
+	pass
+
+func _process(delta):
+	margin_top = ((150 -get_parent().get_parent().health)*38)/150 + 2
+	pass
+"
+
+[node name="enemy" type="KinematicBody2D" groups=[
+"Zombie",
+]]
+collision_layer = 3
+collision_mask = 3
+script = SubResource( 1 )
+
+[node name="enemybody" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="enemybody"]
+modulate = Color( 0.476563, 0, 1, 0.403333 )
+position = Vector2( -0.527044, -0.263521 )
+shape = SubResource( 2 )
+
+[node name="enemybody2" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="enemybody2"]
+shape = SubResource( 3 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 5.27044, 2.3717 )
+shape = SubResource( 4 )
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2( 41.7389, 2.56656 )
+shape = SubResource( 5 )
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+autostart = true
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+visible = false
+margin_left = -20.0
+margin_top = -21.0
+margin_right = 20.0
+margin_bottom = 19.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Timer 2" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[node name="Timer 3" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="Area2D2" type="Area2D" parent="."]
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Area2D2"]
+shape = SubResource( 6 )
+
+[node name="Sprite" type="AnimatedSprite" parent="."]
+position = Vector2( 0.948341, -1.84465 )
+scale = Vector2( 2, 2 )
+frames = SubResource( 7 )
+frame = 3
+playing = true
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_left = -33.0
+margin_top = -19.0
+margin_right = -21.0
+margin_bottom = 23.0
+color = Color( 0, 0, 0, 1 )
+
+[node name="ColorRect2" type="ColorRect" parent="ColorRect"]
+margin_left = 2.0
+margin_top = 2.0
+margin_right = 10.0
+margin_bottom = 40.0
+color = Color( 1, 0.680939, 0.00390625, 1 )
+script = SubResource( 8 )
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_enter"]
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
+[connection signal="timeout" from="Timer 2" to="." method="_on_Timer_2_timeout"]
+[connection signal="timeout" from="Timer 3" to="." method="_on_Timer_3_timeout"]

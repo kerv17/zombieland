@@ -1,0 +1,101 @@
+[gd_scene load_steps=7 format=2]
+
+
+[sub_resource type="CircleShape2D" id=2]
+
+custom_solver_bias = 0.0
+radius = 20.2885
+
+[sub_resource type="GDScript" id=1]
+
+script/source = "extends RigidBody2D
+
+#vars
+var hits =0
+var max_hits = 1
+
+func _on_Timer_timeout():
+	print(\"gone\")
+	queue_free()
+	pass # replace with function body
+func _ready():
+	set_fixed_process(true)
+	print(1)
+	pass
+func _process(delta):
+	if get_node(\"Timer\").get_time_left()==0:
+		queue_free()
+	pass
+
+
+func _on_Area2D_area_enter( body ):
+	queue_free()
+	pass # replace with function body
+
+func _on_Area2D_body_enter( body ):
+	if body.get_name() != \"bullet\":
+		if hits == max_hits:
+			print(\"collides!\")
+			print(body.get_name())
+			queue_free()
+		else:
+			hits += 1
+			print(hits)
+	pass # replace with function body"
+
+[node name="RigidBody2D" type="RigidBody2D"]
+
+input_pickable = false
+shapes/0/shape = SubResource( 2 )
+shapes/0/transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+shapes/0/trigger = false
+collision_layer = 1
+collision_mask = 1
+mode = 0
+mass = 1.0
+friction = 0.0
+bounce = 1.0
+gravity_scale = 0.0
+custom_integrator = false
+continuous_cd = 0
+contacts_reported = 0
+contact_monitor = false
+sleeping = false
+can_sleep = true
+linear_velocity = Vector2( 0, 0 )
+angular_velocity = 0.0
+damp_override/linear = -1.0
+damp_override/angular = -1.0
+script = SubResource( 1 )
+
+[node name="Timer" type="Timer" parent="."]
+
+process_mode = 1
+wait_time = 1.0
+one_shot = true
+autostart = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+shape = SubResource( 2 )
+trigger = false
+_update_shape_index = 0
+
+[node name="Area2D" type="Area2D" parent="."]
+
+input_pickable = true
+shapes/0/shape = SubResource( 2 )
+shapes/0/transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+shapes/0/trigger = false
+gravity_vec = Vector2( 0, 1 )
+gravity = 98.0
+linear_damp = 0.1
+angular_damp = 1.0
+
+[node name="CollisionShape2D1" type="CollisionShape2D" parent="Area2D"]
+
+shape = SubResource( 2 )
+trigger = false
+_update_shape_index = 0
+
+[connection signal="timeout"  from="Timer"  to="." method="_on_Timer_timeout" binds=[  ]]

@@ -1,0 +1,88 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://target.png" type="Texture" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node
+
+var Screentouch
+var a = 0
+var b = 0.0
+var Record_time = 0
+var Record_kill = 0
+var Kill = 0
+var dict = {}
+export var game_speed = 12.5
+func _ready():
+	Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
+	set_process(true)
+	OS.window_position = OS.get_screen_position()
+	OS.window_size = OS.get_screen_size()
+	Screentouch = OS.has_touchscreen_ui_hint()
+	if OS.get_name() ==  \"Android\":
+		Engine.target_fps = 30
+	pass
+func load_save():
+    var savegame = File.new()
+    if !savegame.file_exists(\"user://savegame.save\"):
+        return
+    var currentline = {}
+    savegame.open(\"user://savegame.save\", File.READ)
+    var data = parse_json( savegame.get_as_text() )
+    set_data( data )
+    savegame.close()
+    OS.get_screen_size()
+    pass
+func set_data( data ):
+	Record_time = data.Record_time
+	Record_kill = data.Record_kill
+	pass
+func save_game():
+	var savegame = File.new()
+	savegame.open(\"user://savegame.save\", File.WRITE)
+	save()
+	savegame.store_line(to_json(dict))
+	savegame.close()
+	pass
+func save():
+	dict = { \"Record_time\" : Record_time, \"Record_kill\" : Record_kill}
+	return dict
+	pass
+	
+func _process(delta):
+	get_node(\"CanvasLayer/RichTextLabel\").bbcode_text =\"Static Memory:\"+ str(float(Performance.get_monitor(Performance.MEMORY_STATIC)/1048576))
+	get_node(\"CanvasLayer/RichTextLabel\").newline()
+	get_node(\"CanvasLayer/RichTextLabel\").add_text(\"FPS:\"+str(Performance.get_monitor(Performance.TIME_FPS)))
+"
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 24.1169
+
+[node name="Node" type="Node"]
+script = SubResource( 1 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Sprite" type="Sprite" parent="CanvasLayer"]
+visible = false
+position = Vector2( 0.463928, -0.347946 )
+z_index = 3
+z_as_relative = false
+texture = ExtResource( 1 )
+
+[node name="Area2D" type="Area2D" parent="CanvasLayer/Sprite"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/Sprite/Area2D"]
+visible = false
+position = Vector2( -0.811875, 0.811875 )
+shape = SubResource( 2 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer"]
+margin_top = 840.0
+margin_right = 211.0
+margin_bottom = 900.0
+bbcode_enabled = true
+scroll_following = true
+__meta__ = {
+"_edit_use_anchors_": false
+}

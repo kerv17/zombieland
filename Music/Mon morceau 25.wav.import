@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/Mon morceau 25.wav-80171aca807a8bd88fbbbf87edd74f09.sample"
+
+[deps]
+
+source_file="res://Music/Mon morceau 25.wav"
+dest_files=[ "res://.import/Mon morceau 25.wav-80171aca807a8bd88fbbbf87edd74f09.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=true
+edit/loop=true
+compress/mode=0

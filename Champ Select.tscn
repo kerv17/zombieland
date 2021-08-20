@@ -1,0 +1,418 @@
+[gd_scene load_steps=15 format=2]
+
+[ext_resource path="res://Music/Mon morceau 27.wav" type="AudioStream" id=1]
+[ext_resource path="res://Wallpaper.png" type="Texture" id=2]
+[ext_resource path="res://small_bold_pixel7.ttf" type="DynamicFontData" id=3]
+[ext_resource path="res://Characters/SelectYellow.png" type="Texture" id=4]
+[ext_resource path="res://Characters/SelectOrange.png" type="Texture" id=5]
+[ext_resource path="res://Characters/SelectRed.png" type="Texture" id=6]
+[ext_resource path="res://Characters/SelectPink.png" type="Texture" id=7]
+[ext_resource path="res://Characters/SelectBlue.png" type="Texture" id=8]
+[ext_resource path="res://Characters/SelectGreen.png" type="Texture" id=9]
+[ext_resource path="res://Characters/SelectPurple.png" type="Texture" id=10]
+[ext_resource path="res://Characters/SelectGray.png" type="Texture" id=11]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node
+
+
+var a
+var b = [\"res://maps/Tileset1.tscn\",\"res://maps/Tileset2.tscn\"]
+var c
+var d
+var e
+var run =false
+func _ready():
+	randomize()
+	
+	d = float(randi()%2)
+	
+	pass
+	
+
+func _process(delta):
+	
+	if e == null:
+		e = get_node(\"Sprite\").get_path()
+	if has_node(e):
+		if get_node(\"Sprite/Button\").is_hovered():
+			get_node(\"Sprite/Button\").self_modulate = get_node(\"Sprite/Button/ColorRect\").color
+			get_node(\"Sprite/Button/RichTextLabel\").visible =true
+		else:
+			get_node(\"Sprite/Button\").self_modulate = Color(1,1,1,0)
+			get_node(\"Sprite/Button/RichTextLabel\").visible =false
+
+		if get_node(\"Sprite/Button2\").is_hovered():
+			get_node(\"Sprite/Button2\").self_modulate = get_node(\"Sprite/Button2/ColorRect\").color
+			get_node(\"Sprite/Button2/RichTextLabel\").visible =true
+		else:
+			get_node(\"Sprite/Button2\").self_modulate = Color(1,1,1,0)
+			get_node(\"Sprite/Button2/RichTextLabel\").visible =false
+
+		if get_node(\"Sprite/Button3\").is_hovered():
+			get_node(\"Sprite/Button3\").self_modulate = get_node(\"Sprite/Button3/ColorRect\").color
+			get_node(\"Sprite/Button3/RichTextLabel\").visible =true
+		else:
+			get_node(\"Sprite/Button3\").self_modulate = Color(1,1,1,0)
+			get_node(\"Sprite/Button3/RichTextLabel\").visible =false
+
+		if get_node(\"Sprite/Button1\").is_hovered():
+			get_node(\"Sprite/Button1\").self_modulate = get_node(\"Sprite/Button1/ColorRect\").color
+			get_node(\"Sprite/Button1/RichTextLabel\").visible =true
+		else:
+			get_node(\"Sprite/Button1\").self_modulate = Color(1,1,1,0)
+			get_node(\"Sprite/Button1/RichTextLabel\").visible =false
+
+		if get_node(\"Sprite/Button4\").is_hovered():
+			get_node(\"Sprite/Button4\").self_modulate = get_node(\"Sprite/Button4/ColorRect\").color
+			get_node(\"Sprite/Button4/RichTextLabel\").visible =true
+		else:
+			get_node(\"Sprite/Button4\").self_modulate = Color(1,1,1,0)
+			get_node(\"Sprite/Button4/RichTextLabel\").visible = false
+			
+		if get_node(\"Sprite/Button5\").is_hovered():
+			get_node(\"Sprite/Button5\").self_modulate = get_node(\"Sprite/Button5/ColorRect\").color
+			get_node(\"Sprite/Button5/RichTextLabel\").visible =true
+		else:
+			get_node(\"Sprite/Button5\").self_modulate = Color(1,1,1,0)
+			get_node(\"Sprite/Button5/RichTextLabel\").visible = false
+	
+	
+	
+	if Input.is_action_just_pressed(\"ui_cancel\"):
+		if run == false:
+			get_tree().change_scene(\"res://Menu.tscn\")
+		else:
+			get_tree().change_scene(\"res://Game over.tscn\")
+
+
+
+func _on_Button1_pressed():
+	a = preload(\"res://Characters/Yellow.tscn\").instance()
+	run()
+	pass # replace with function body
+
+
+func _on_Button2_pressed():
+	a = preload(\"res://Characters/Red.tscn\").instance()
+	run()
+	print(\"red\")
+	pass # replace with function body
+
+
+
+
+func _on_Button3_pressed():
+	a = preload(\"res://Characters/Green.tscn\").instance()
+	run()
+	pass # replace with function body
+
+
+
+
+func _on_Button_pressed():
+	a = preload(\"res://Characters/Character.tscn\").instance()
+	run()
+	pass # replace with function body
+
+func run():
+	run = true
+	if d == 0:
+		var map = preload(\"res://maps/Tileset2.tscn\").instance()
+		add_child(map)
+		get_node(\"Sprite\").queue_free()
+		a.position = Vector2(662, 468)
+		get_node(\"Node\").add_child(a)
+	if d == 1:
+		var map = preload(\"res://maps/Tileset1.tscn\").instance()
+		add_child(map)
+		get_node(\"Sprite\").queue_free()
+		a.position = Vector2(662, 468)
+		get_node(\"Node\").add_child(a)
+	get_node(\"StreamPlayer\").playing =true
+	
+func _on_Button4_pressed():
+	a = preload(\"res://Characters/Orange.tscn\").instance()
+	run()
+	pass # replace with function body
+
+
+func _on_Button5_pressed():
+	a = preload(\"res://Characters/Pink.tscn\").instance()
+	run()
+	pass # replace with function body
+"
+
+[sub_resource type="DynamicFont" id=2]
+size = 199
+font_data = ExtResource( 3 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 100
+font_data = ExtResource( 3 )
+
+[node name="Node" type="Node"]
+script = SubResource( 1 )
+
+[node name="StreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 1 )
+volume_db = -25.0
+
+[node name="Sprite" type="CanvasLayer" parent="."]
+editor/display_folded = true
+layer = -1
+
+[node name="Sprite" type="Sprite" parent="Sprite"]
+self_modulate = Color( 0.296875, 0.296875, 0.296875, 1 )
+position = Vector2( 810, 460 )
+scale = Vector2( 7.49219, 7.49219 )
+texture = ExtResource( 2 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Sprite"]
+margin_left = 370.0
+margin_top = 100.0
+margin_right = 1230.0
+margin_bottom = 567.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_fonts/normal_font = SubResource( 2 )
+bbcode_enabled = true
+bbcode_text = "[center]CHOOSE YOUR
+CHARACTER[/center]"
+text = "CHOOSE YOUR
+CHARACTER"
+
+[node name="Button1" type="Button" parent="Sprite"]
+self_modulate = Color( 1, 1, 1, 0 )
+show_behind_parent = true
+margin_left = 150.0
+margin_top = 670.0
+margin_right = 550.0
+margin_bottom = 945.0
+rect_scale = Vector2( 0.5, 0.5 )
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Sprite1" type="Sprite" parent="Sprite/Button1"]
+position = Vector2( 160, 100 )
+scale = Vector2( 4.2394, 4.2394 )
+texture = ExtResource( 4 )
+flip_h = true
+
+[node name="ColorRect" type="ColorRect" parent="Sprite/Button1"]
+margin_top = 260.0
+margin_right = 400.0
+margin_bottom = 280.0
+color = Color( 1, 0.984375, 0, 1 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Sprite/Button1"]
+margin_top = 280.0
+margin_right = 400.0
+margin_bottom = 420.0
+custom_fonts/normal_font = SubResource( 3 )
+bbcode_enabled = true
+bbcode_text = "[center] Time Stop [/center]"
+text = " Time Stop "
+scroll_active = false
+
+[node name="Button4" type="Button" parent="Sprite"]
+self_modulate = Color( 1, 1, 1, 0 )
+margin_left = 370.0
+margin_top = 670.0
+margin_right = 770.0
+margin_bottom = 945.0
+rect_scale = Vector2( 0.5, 0.5 )
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Sprite" type="Sprite" parent="Sprite/Button4"]
+position = Vector2( 220, 100 )
+scale = Vector2( 4.2394, 4.2394 )
+texture = ExtResource( 5 )
+flip_h = true
+
+[node name="ColorRect" type="ColorRect" parent="Sprite/Button4"]
+margin_top = 260.0
+margin_right = 400.0
+margin_bottom = 280.0
+color = Color( 1, 0.46875, 0, 1 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Sprite/Button4"]
+margin_top = 280.0
+margin_right = 400.0
+margin_bottom = 420.0
+custom_fonts/normal_font = SubResource( 3 )
+bbcode_enabled = true
+bbcode_text = "[center] Fear [/center]"
+text = " Fear "
+
+[node name="Button2" type="Button" parent="Sprite"]
+self_modulate = Color( 1, 1, 1, 0 )
+margin_left = 590.0
+margin_top = 670.0
+margin_right = 990.0
+margin_bottom = 945.0
+rect_scale = Vector2( 0.5, 0.5 )
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Sprite" type="Sprite" parent="Sprite/Button2"]
+position = Vector2( 34.0841, 91.1975 )
+scale = Vector2( 4.49494, 4.49494 )
+texture = ExtResource( 6 )
+flip_h = true
+
+[node name="ColorRect" type="ColorRect" parent="Sprite/Button2"]
+margin_top = 260.0
+margin_right = 400.0
+margin_bottom = 280.0
+color = Color( 1, 0, 0, 1 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Sprite/Button2"]
+margin_top = 280.0
+margin_right = 400.0
+margin_bottom = 420.0
+custom_fonts/normal_font = SubResource( 3 )
+bbcode_enabled = true
+bbcode_text = "[center] Ghost [/center]"
+text = " Ghost "
+
+[node name="Button5" type="Button" parent="Sprite"]
+self_modulate = Color( 1, 1, 1, 0 )
+margin_left = 810.0
+margin_top = 670.0
+margin_right = 1210.0
+margin_bottom = 945.0
+rect_scale = Vector2( 0.5, 0.5 )
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Sprite" type="Sprite" parent="Sprite/Button5"]
+position = Vector2( 227.849, 88.5819 )
+scale = Vector2( 4.66219, 4.66219 )
+texture = ExtResource( 7 )
+flip_h = true
+
+[node name="ColorRect" type="ColorRect" parent="Sprite/Button5"]
+margin_top = 260.0
+margin_right = 400.0
+margin_bottom = 280.0
+color = Color( 0.738281, 0.239365, 0.566779, 1 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Sprite/Button5"]
+margin_left = -60.0
+margin_top = 280.0
+margin_right = 460.0
+margin_bottom = 420.0
+custom_fonts/normal_font = SubResource( 3 )
+bbcode_enabled = true
+bbcode_text = "[center] Mind Control [/center]"
+text = " Mind Control "
+scroll_active = false
+
+[node name="Button" type="Button" parent="Sprite"]
+self_modulate = Color( 1, 1, 1, 0 )
+margin_left = 1030.0
+margin_top = 670.0
+margin_right = 1430.0
+margin_bottom = 945.0
+rect_scale = Vector2( 0.5, 0.5 )
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Sprite" type="Sprite" parent="Sprite/Button"]
+position = Vector2( 234.031, 95.3884 )
+scale = Vector2( 4.66219, 4.52327 )
+texture = ExtResource( 8 )
+flip_h = true
+
+[node name="ColorRect" type="ColorRect" parent="Sprite/Button"]
+margin_top = 260.0
+margin_right = 400.0
+margin_bottom = 280.0
+color = Color( 0, 0.4375, 1, 1 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Sprite/Button"]
+margin_top = 280.0
+margin_right = 400.0
+margin_bottom = 420.0
+custom_fonts/normal_font = SubResource( 3 )
+bbcode_enabled = true
+bbcode_text = "[center] Build [/center]"
+text = " Build "
+scroll_active = false
+
+[node name="Button3" type="Button" parent="Sprite"]
+self_modulate = Color( 1, 1, 1, 0 )
+margin_left = 1250.0
+margin_top = 670.0
+margin_right = 1650.0
+margin_bottom = 945.0
+rect_scale = Vector2( 0.5, 0.5 )
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Sprite" type="Sprite" parent="Sprite/Button3"]
+position = Vector2( 145.778, 89.8199 )
+scale = Vector2( 4.67081, 4.67081 )
+texture = ExtResource( 9 )
+flip_h = true
+
+[node name="ColorRect" type="ColorRect" parent="Sprite/Button3"]
+margin_top = 260.0
+margin_right = 400.0
+margin_bottom = 280.0
+color = Color( 0.150146, 0.480469, 0, 1 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Sprite/Button3"]
+margin_top = 280.0
+margin_right = 400.0
+margin_bottom = 420.0
+custom_fonts/normal_font = SubResource( 3 )
+bbcode_enabled = true
+bbcode_text = "[center] Teleport [/center]"
+text = " Teleport "
+scroll_active = false
+
+[node name="Button6" type="Button" parent="Sprite"]
+editor/display_folded = true
+visible = false
+margin_left = 1015.0
+margin_top = 594.0
+margin_right = 1415.0
+margin_bottom = 869.0
+rect_scale = Vector2( 0.5, 0.5 )
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Sprite" type="Sprite" parent="Sprite/Button6"]
+position = Vector2( 227.849, 88.5819 )
+scale = Vector2( 4.66219, 4.66219 )
+texture = ExtResource( 10 )
+flip_h = true
+
+[node name="Button7" type="Button" parent="Sprite"]
+editor/display_folded = true
+visible = false
+margin_left = 1223.0
+margin_top = 594.0
+margin_right = 1623.0
+margin_bottom = 869.0
+rect_scale = Vector2( 0.5, 0.5 )
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Sprite" type="Sprite" parent="Sprite/Button7"]
+position = Vector2( 227.849, 88.5819 )
+scale = Vector2( 4.66219, 4.66219 )
+texture = ExtResource( 11 )
+flip_h = true
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color( 0.0859375, 0.0859375, 0.0859375, 1 )
+[connection signal="pressed" from="Sprite/Button1" to="." method="_on_Button1_pressed"]
+[connection signal="pressed" from="Sprite/Button4" to="." method="_on_Button4_pressed"]
+[connection signal="pressed" from="Sprite/Button2" to="." method="_on_Button2_pressed"]
+[connection signal="pressed" from="Sprite/Button5" to="." method="_on_Button5_pressed"]
+[connection signal="pressed" from="Sprite/Button" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="Sprite/Button3" to="." method="_on_Button3_pressed"]

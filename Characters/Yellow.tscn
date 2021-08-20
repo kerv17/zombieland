@@ -1,0 +1,170 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Characters/spot.png" type="Texture" id=1]
+[ext_resource path="res://Characters/sprite/dudeyellow.png" type="Texture" id=2]
+[ext_resource path="res://Characters/sprite/dudeyellow2.png" type="Texture" id=3]
+[ext_resource path="res://Characters/sprite/dudeyellow3.png" type="Texture" id=4]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends KinematicBody2D
+
+# class member variables go here, for example:
+var a = Vector2()
+var speed
+var mpos
+var gun
+var anim
+var mpos1
+var health = 160
+var count = 100
+var max_count = 100
+# var b = \"textvar\"
+
+func _ready():
+	set_process(true)
+	get_parent().a = health
+	pass
+
+func _process(delta):
+	#MOVEMENT
+	if Input.is_action_pressed(\"run\"):
+		speed = 1500
+	else:
+		speed = 1400
+	
+	if Input.is_action_pressed(\"ui_up\"):
+		a.y = -speed
+	elif Input.is_action_pressed(\"ui_down\"):
+		a.y = speed
+	else:
+		a.y = 0
+	if Input.is_action_pressed(\"ui_left\"):
+		a.x = -speed
+	elif Input.is_action_pressed(\"ui_right\"):
+		a.x = speed
+	else:
+		a.x = 0
+	
+	var motion = a * delta *autoload.game_speed
+	if motion != Vector2(0,0):
+		anim = \"run\"
+	else:
+		anim = \"default\"
+	get_node(\"AnimatedSprite\").play(anim)
+	move_and_slide(motion)
+
+		
+	if autoload.Screentouch ==false:
+		mpos = get_global_mouse_position()
+		look_at(mpos)
+	else:
+		rotation_degrees = rad2deg(get_parent().b)
+	
+	var pos = get_position()
+	if Input.is_action_pressed(\"shoot\"):
+		if get_node(\"Timer\").get_time_left() == 0:
+			get_node(\"Timer\").start()
+			var bullet = preload(\"res://Bullets/Basic.tscn\").instance()
+			get_parent().get_node(\"bullets\").add_child( bullet )
+			bullet.damage = 20
+			bullet.add_collision_exception_with(self) # don't want player to collide with bullet
+			if autoload.Screentouch == false:
+				bullet.set_linear_velocity(3000*((mpos-pos).normalized()))
+			else:
+				bullet.set_linear_velocity(3000*(get_parent().c.normalized()))
+			bullet.set_position( get_node(\"AnimatedSprite\").get_global_position() ) #use node for shoot position
+			
+	if Input.is_action_pressed(\"ability\"):
+		if count >0:
+			get_node(\"Timer 2\").start()
+			get_tree().paused=true
+			get_node(\"Timer 2/THE WORLD\").start()
+			count -=1
+		else:
+			get_tree().paused =false
+
+
+
+
+	if Input.is_action_just_released('ability'):
+		get_tree().paused=false
+		Engine.time_scale = 1.0
+	if health <= 0:
+		get_tree().change_scene(\"res://Gameover.tscn\")
+		Engine.time_scale = 1.0
+
+
+
+
+
+
+
+func _on_THE_WORLD_timeout():
+	if Input.is_action_pressed(\"ability\") == false and count < max_count:
+		count +=1
+	pass # replace with function body
+"
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 35.784
+
+[sub_resource type="SpriteFrames" id=3]
+animations = [ {
+"frames": [ ExtResource( 2 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 3 ), ExtResource( 2 ), ExtResource( 4 ), ExtResource( 2 ) ],
+"loop": true,
+"name": "run",
+"speed": 5.0
+} ]
+
+[node name="KinematicBody2D" type="KinematicBody2D" groups=[
+"player",
+]]
+pause_mode = 2
+collision_layer = 3
+script = SubResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 2 )
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.07
+one_shot = true
+
+[node name="Timer 2" type="Timer" parent="."]
+pause_mode = 2
+wait_time = 0.01
+
+[node name="THE WORLD" type="Timer" parent="Timer 2"]
+wait_time = 0.05
+
+[node name="Sprite 2" type="Sprite" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true
+drag_margin_h_enabled = false
+drag_margin_v_enabled = false
+smoothing_enabled = true
+
+[node name="Node" type="Node" parent="."]
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D1" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource( 2 )
+
+[node name="Light2D" type="Light2D" parent="."]
+texture = ExtResource( 1 )
+texture_scale = 10.0
+energy = 0.75
+shadow_enabled = true
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+position = Vector2( -2.34586, 7.42825 )
+scale = Vector2( 2, 2 )
+frames = SubResource( 3 )
+[connection signal="timeout" from="Timer 2/THE WORLD" to="." method="_on_THE_WORLD_timeout"]

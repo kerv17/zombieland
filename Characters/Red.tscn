@@ -1,0 +1,156 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Characters/sprite/dudered.png" type="Texture" id=1]
+[ext_resource path="res://Characters/sprite/dudered2.png" type="Texture" id=2]
+[ext_resource path="res://Characters/sprite/dudered3.png" type="Texture" id=3]
+[ext_resource path="res://Characters/spot.png" type="Texture" id=4]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends KinematicBody2D
+
+# class member variables go here, for example:
+var a = Vector2()
+var speed
+var mpos
+var gun
+var anim
+var health = 80
+var count = 100
+var max_count =100
+# var b = \"textvar\"
+
+func _ready():
+	set_process(true)
+	get_parent().a = health
+	pass
+
+func _process(delta):
+	#MOVEMENT
+	if Input.is_action_pressed(\"run\"):
+		speed = 1500
+	else:
+		speed = 900
+	
+	if Input.is_action_pressed(\"ui_up\"):
+		a.y = -speed
+	elif Input.is_action_pressed(\"ui_down\"):
+		a.y = speed
+	else:
+		a.y = 0
+	if Input.is_action_pressed(\"ui_left\"):
+		a.x = -speed
+	elif Input.is_action_pressed(\"ui_right\"):
+		a.x = speed
+	else:
+		a.x = 0
+	
+	var motion = a * delta * autoload.game_speed
+	if motion != Vector2(0,0):
+		anim = \"run\"
+	else:
+		anim = \"default\"
+	get_node(\"AnimatedSprite\").play(anim)
+	move_and_slide(motion)
+	
+	if autoload.Screentouch ==false:
+		mpos = get_global_mouse_position()
+		look_at(mpos)
+	else:
+		rotation_degrees = rad2deg(get_parent().b)
+	
+	var pos = get_position()
+	if Input.is_action_pressed(\"shoot\"):
+		if get_node(\"Timer\").get_time_left() == 0:
+			get_node(\"Timer\").start()
+			var bullet = preload(\"res://Bullets/Basic.tscn\").instance()
+			get_parent().get_node(\"bullets\").add_child( bullet )
+			bullet.damage = 50
+			bullet.add_collision_exception_with(self) # don't want player to collide with bullet
+			if autoload.Screentouch == false:
+				bullet.set_linear_velocity(3000*((mpos-pos).normalized()))
+			else:
+				bullet.set_linear_velocity(3000*(get_parent().c.normalized()))
+			bullet.set_position( get_node(\"AnimatedSprite\").get_global_position() ) #use node for shoot position
+			
+	if Input.is_action_pressed(\"ability\"):
+		if get_node(\"Timer 2\").get_time_left()==0 and count > 0:
+			get_node(\"Timer 2/Ghost\").start()
+			get_node(\"CollisionShape2D\").disabled = true
+			get_node(\"AnimatedSprite\").modulate = Color(1,1,1,0.5)
+			count -=1
+			get_node(\"Light2D\").shadow_enabled = false
+		else:
+			get_node(\"CollisionShape2D\").disabled = false
+			get_node(\"Light2D\").shadow_enabled = true
+			get_node(\"AnimatedSprite\").modulate = Color(1,1,1,1)
+	else:
+		if get_node(\"Timer 2\").get_time_left()==0 and count < max_count:
+			get_node(\"Timer 2/Ghost\").start()
+			count +=1
+			get_node(\"CollisionShape2D\").disabled = false
+			get_node(\"AnimatedSprite\").modulate = Color(1,1,1,1)
+			get_node(\"Light2D\").shadow_enabled = true
+			
+
+
+		
+	get_parent().health = health
+	
+	if health <= 0:
+		get_tree().change_scene(\"res://Gameover.tscn\")
+
+"
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 35.784
+
+[sub_resource type="SpriteFrames" id=3]
+animations = [ {
+"frames": [ ExtResource( 1 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 2 ), ExtResource( 1 ), ExtResource( 3 ), ExtResource( 1 ) ],
+"loop": true,
+"name": "run",
+"speed": 5.0
+} ]
+
+[node name="KinematicBody2D" type="KinematicBody2D" groups=[
+"player",
+]]
+collision_layer = 3
+script = SubResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 2 )
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.33
+one_shot = true
+
+[node name="Timer 2" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[node name="Ghost" type="Timer" parent="Timer 2"]
+wait_time = 2.0
+one_shot = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true
+smoothing_enabled = true
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+position = Vector2( -2.6865, 6.36098 )
+scale = Vector2( 2, 2 )
+frames = SubResource( 3 )
+
+[node name="Light2D" type="Light2D" parent="."]
+texture = ExtResource( 4 )
+texture_scale = 10.0
+energy = 0.75
+shadow_enabled = true
+
+[connection signal="timeout" from="Timer 2/Ghost" to="." method="_on_Ghost_timeout"]

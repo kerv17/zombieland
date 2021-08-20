@@ -1,0 +1,145 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Tileset v3.png" type="Texture" id=1]
+[ext_resource path="res://maps/Zombie 3.0_maps_Tile Map Shader.tres" type="Material" id=2]
+
+[sub_resource type="NavigationPolygon" id=1]
+
+vertices = PoolVector2Array( 48, -48, 48, 48, -48, 48, -48, -48 )
+polygons = [ PoolIntArray( 0, 1, 2, 3 ) ]
+outlines = [ PoolVector2Array( -48, -48, -48, 48, 48, 48, 48, -48 ) ]
+
+[sub_resource type="RectangleShape2D" id=2]
+
+custom_solver_bias = 0.0
+extents = Vector2( 48, 48 )
+
+[sub_resource type="CanvasItemMaterial" id=3]
+
+render_priority = 0
+blend_mode = 1
+light_mode = 2
+
+[sub_resource type="OccluderPolygon2D" id=4]
+
+closed = true
+cull_mode = 0
+polygon = PoolVector2Array( -48, -48, -48, 48, 48, 48, 48, -48 )
+
+[node name="TileSet" type="Node"]
+
+[node name="White_floor_edge" type="Sprite" parent="." index="0"]
+
+position = Vector2( 48, 48 )
+texture = ExtResource( 1 )
+region_enabled = true
+region_rect = Rect2( 0, 224, 96, 96 )
+_sections_unfolded = [ "Animation", "Offset", "Region" ]
+
+[node name="NavigationPolygonInstance" type="NavigationPolygonInstance" parent="White_floor_edge" index="0"]
+
+navpoly = SubResource( 1 )
+enabled = true
+_sections_unfolded = [ "Visibility" ]
+
+[node name="Dark_wall" type="Sprite" parent="." index="1"]
+
+light_mask = 0
+material = ExtResource( 2 )
+position = Vector2( 144, 48 )
+z_index = 1
+texture = ExtResource( 1 )
+region_enabled = true
+region_rect = Rect2( 832, 160, 96, 96 )
+_sections_unfolded = [ "Animation", "Region", "Visibility", "Z Index" ]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Dark_wall" index="0"]
+
+editor/display_folded = true
+input_pickable = false
+collision_layer = 1
+collision_mask = 1
+constant_linear_velocity = Vector2( 0, 0 )
+constant_angular_velocity = 0.0
+friction = 1.0
+bounce = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dark_wall/StaticBody2D" index="0"]
+
+shape = SubResource( 2 )
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Dark_wall" index="1"]
+
+modulate = Color( 1, 1, 1, 0.392157 )
+show_behind_parent = true
+material = SubResource( 3 )
+z_as_relative = false
+occluder = SubResource( 4 )
+light_mask = 1
+_sections_unfolded = [ "Transform", "Visibility", "Z Index" ]
+
+[node name="Caution_wall" type="Sprite" parent="." index="2"]
+
+light_mask = 0
+material = ExtResource( 2 )
+position = Vector2( 240, 48 )
+z_index = 1
+texture = ExtResource( 1 )
+region_enabled = true
+region_rect = Rect2( 576, 256, 96, 96 )
+_sections_unfolded = [ "Animation", "Material", "Region", "Visibility", "Z Index" ]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Caution_wall" index="0"]
+
+editor/display_folded = true
+input_pickable = false
+collision_layer = 1
+collision_mask = 1
+constant_linear_velocity = Vector2( 0, 0 )
+constant_angular_velocity = 0.0
+friction = 1.0
+bounce = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Caution_wall/StaticBody2D" index="0"]
+
+shape = SubResource( 2 )
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Caution_wall" index="1"]
+
+modulate = Color( 1, 1, 1, 0.392157 )
+show_behind_parent = true
+material = SubResource( 3 )
+z_as_relative = false
+occluder = SubResource( 4 )
+light_mask = 1
+_sections_unfolded = [ "Material", "Visibility", "Z Index" ]
+
+[node name="Dark_floor" type="Sprite" parent="." index="3"]
+
+position = Vector2( 336, 48 )
+texture = ExtResource( 1 )
+region_enabled = true
+region_rect = Rect2( 96, 608, 96, 96 )
+_sections_unfolded = [ "Animation", "Region", "Visibility" ]
+
+[node name="NavigationPolygonInstance2" type="NavigationPolygonInstance" parent="Dark_floor" index="0"]
+
+navpoly = SubResource( 1 )
+enabled = true
+_sections_unfolded = [ "Visibility" ]
+
+[node name="White_floor" type="Sprite" parent="." index="4"]
+
+position = Vector2( 432, 48 )
+texture = ExtResource( 1 )
+region_enabled = true
+region_rect = Rect2( 0, 224, 96, 96 )
+_sections_unfolded = [ "Animation", "Region" ]
+
+[node name="NavigationPolygonInstance3" type="NavigationPolygonInstance" parent="White_floor" index="0"]
+
+navpoly = SubResource( 1 )
+enabled = true
+_sections_unfolded = [ "Visibility" ]
+
+

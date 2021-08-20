@@ -1,0 +1,175 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://Characters/sprite/Zombie2.png" type="Texture" id=1]
+[ext_resource path="res://Characters/sprite/Zombie.png" type="Texture" id=2]
+[ext_resource path="res://Characters/sprite/Zombie3.png" type="Texture" id=3]
+[ext_resource path="res://Characters/sprite/zombiepink2.png" type="Texture" id=4]
+[ext_resource path="res://Characters/sprite/zombiepink.png" type="Texture" id=5]
+[ext_resource path="res://Characters/sprite/zombiepink3.png" type="Texture" id=6]
+[ext_resource path="res://Characters/sprite/zombieorange3.png" type="Texture" id=7]
+[ext_resource path="res://Characters/sprite/zombieorange.png" type="Texture" id=8]
+[ext_resource path="res://Characters/sprite/zombieorange2.png" type="Texture" id=9]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends KinematicBody2D
+var target
+var players = []
+var nav = Navigation2D.new()
+var Move = Vector2()
+var health = 150
+func _ready():
+	players = [get_node(\"/root\").get_node(\"Node\").get_node(\"player\")]
+
+	set_process(true)
+	findTarget()
+	pass
+
+func _process(delta):
+	followTarget(delta)
+	checkHealth()
+	pass
+
+func checkHealth():
+	if health <= 0:
+		queue_free()
+
+func findTarget():
+	var distance = INF
+	for i in players:
+		if position.distance_to(i.position) < distance:
+			target = i
+			distance = position.distance_to(i.position)
+		pass
+	pass
+
+func followTarget(delta):
+	if target != null:
+		var path = nav.get_simple_path(position, target.position)
+		print(path, position, target.position)
+		if path.size() >= 1:
+			Move = -(position-path[1])
+			var d = position.distance_to(path[1])
+					
+			if d < 0.05:
+				path.remove(0)
+					
+		#TO BE SWAPPED WITH PATHFINDING LOGIC
+		look_at(target.position)
+		get_node(\"CollisionShape2D\").global_rotation =0
+		Move = position.direction_to(target.position)*300
+		move_and_slide(Move)
+
+"
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 26.669, 24.7893 )
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 13.6511, 22.9298 )
+
+[sub_resource type="CircleShape2D" id=4]
+radius = 38.6427
+
+[sub_resource type="SpriteFrames" id=5]
+animations = [ {
+"frames": [ ExtResource( 1 ), ExtResource( 2 ), ExtResource( 3 ), ExtResource( 2 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 5 ) ],
+"loop": true,
+"name": "love",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 8 ) ],
+"loop": true,
+"name": "Fear",
+"speed": 5.0
+} ]
+
+[sub_resource type="GDScript" id=6]
+script/source = "extends ColorRect
+
+# class member variables go here, for example:
+# var a = 2
+# var b = \"textvar\"
+
+func _ready():
+	# Called when the node is added to the scene for the first time.
+	set_process(true)
+	pass
+
+func _process(delta):
+	margin_top = ((150 -get_parent().get_parent().health)*38)/150 + 2
+	pass
+"
+
+[node name="enemy" type="KinematicBody2D" groups=[
+"Zombie",
+]]
+script = SubResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 5.27044, 2.3717 )
+shape = SubResource( 2 )
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2( 41.7389, 2.56656 )
+shape = SubResource( 3 )
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+autostart = true
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+visible = false
+margin_left = -20.0
+margin_top = -21.0
+margin_right = 20.0
+margin_bottom = 19.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Timer 2" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[node name="Timer 3" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="Area2D2" type="Area2D" parent="."]
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Area2D2"]
+shape = SubResource( 4 )
+
+[node name="Sprite" type="AnimatedSprite" parent="."]
+position = Vector2( 0.948341, -1.84465 )
+scale = Vector2( 2, 2 )
+frames = SubResource( 5 )
+frame = 3
+playing = true
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_left = -33.0
+margin_top = -19.0
+margin_right = -21.0
+margin_bottom = 23.0
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="ColorRect"]
+margin_left = 2.0
+margin_top = 2.0
+margin_right = 10.0
+margin_bottom = 40.0
+color = Color( 1, 0.680939, 0.00390625, 1 )
+script = SubResource( 6 )
+
+[node name="Navigation2D" type="Navigation2D" parent="."]

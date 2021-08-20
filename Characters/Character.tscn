@@ -1,0 +1,112 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Characters/Animation/Basic.tres" type="SpriteFrames" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends KinematicBody2D
+
+# class member variables go here, for example:
+
+var character_color = \"Red\"
+var character
+
+var speed
+var motion = Vector2(0,0)
+var anim
+
+func _ready():
+	character = load(\"res://Characters/Scripts/\"+character_color+\".gd\")
+	loadStats()
+	
+
+func loadStats():
+	$AnimatedSprite.modulate = character.color
+	$Gun.wait_time = character.fire_rate
+
+
+
+func _input(event):
+	motion = movement()
+	if event.is_action_pressed(\"shoot\"):
+		gun()
+		$Gun.start()
+	if event.is_action_released(\"shoot\"):
+		$Gun.stop()
+
+func _process(delta):
+	if motion != Vector2(0,0): anim = \"run\"
+	else: anim = \"default\"
+	
+	$AnimatedSprite.play(anim)
+	move_and_slide(motion * delta)
+	
+	look_at(get_global_mouse_position())
+
+
+
+func movement():
+	# RUN
+	if Input.is_action_pressed(\"run\"): speed = character.run
+	else: speed = character.walk
+
+	var a = Vector2()
+	
+	# MOVEMENT
+	if Input.is_action_pressed(\"ui_up\"): a.y = -1
+	elif Input.is_action_pressed(\"ui_down\"): a.y = 1
+	else: a.y = 0
+	
+	if Input.is_action_pressed(\"ui_left\"): a.x = -1
+	elif Input.is_action_pressed(\"ui_right\"): a.x = 1
+	else: a.x = 0
+	
+	if Input.is_action_pressed(\"shoot\"): 
+		pass
+		
+	return (a.normalized() * speed * 100)
+
+
+func shoot():
+	if $Gun.get_time_left() == 0:
+		gun()
+	pass
+
+
+func gun():
+	$Gun.start()
+	var bullet = preload(\"res://Bullets/Basic.tscn\").instance()
+	get_parent().get_node(\"bullet\").add_child( bullet )
+	bullet.damage = character.gun_damage
+	bullet.add_collision_exception_with(self) # don't want player to collide with bullet
+	bullet.set_linear_velocity(Vector2(3000*((get_global_mouse_position()-self.position).normalized())))
+	bullet.set_position( $AnimatedSprite.get_global_position() )
+	pass # Replace with function body.
+"
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 42.9709
+
+[node name="KinematicBody2D" type="KinematicBody2D" groups=[
+"player",
+]]
+script = SubResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 2 )
+
+[node name="Gun" type="Timer" parent="."]
+wait_time = 0.2
+
+[node name="Ability Timer" type="Timer" parent="."]
+
+[node name="Recovery Timer" type="Timer" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+position = Vector2( -9.32063, 6.09426 )
+scale = Vector2( 2, 2 )
+frames = ExtResource( 1 )
+
+[connection signal="timeout" from="Gun" to="." method="gun"]
