@@ -14,17 +14,27 @@
 script/source = "extends KinematicBody2D
 var target
 var players = []
-var nav = Navigation2D.new()
 var Move = Vector2()
 var health = 150
+var nav
+var speed
+var path
+var NeedsToCheck = true
 func _ready():
+	var collision = move_and_collide(Vector2(1,1))
+	if collision:
+		queue_free()
+		pass
 	players = [get_node(\"/root\").get_node(\"Node\").get_node(\"player\")]
-
 	set_process(true)
-	findTarget()
+	target = findTarget()
 	pass
 
 func _process(delta):
+	var newTarget = findTarget()
+	if target.name != newTarget.name:
+		target = newTarget
+		NeedsToCheck = true
 	followTarget(delta)
 	checkHealth()
 	pass
@@ -35,34 +45,69 @@ func checkHealth():
 
 func findTarget():
 	var distance = INF
+	var new_target
 	for i in players:
 		if position.distance_to(i.position) < distance:
-			target = i
+			new_target = i
 			distance = position.distance_to(i.position)
 		pass
 	pass
+	return new_target
 
 func followTarget(delta):
 	if target != null:
-		var path = nav.get_simple_path(position, target.position)
-		print(path, position, target.position)
-		if path.size() >= 1:
-			Move = -(position-path[1])
-			var d = position.distance_to(path[1])
+		
+		if NeedsToCheck:
+			findPath()
+		var d = position.distance_to(path[1])
 					
-			if d < 0.05:
-				path.remove(0)
+		if d < 15:
+			findPath()
+			path.remove(1)
+		if path.size() > 1:
+			Move = -(position-path[1])
+			
 					
 		#TO BE SWAPPED WITH PATHFINDING LOGIC
-		look_at(target.position)
-		get_node(\"CollisionShape2D\").global_rotation =0
-		Move = position.direction_to(target.position)*300
-		move_and_slide(Move)
+			look_at(path[1])
+			get_node(\"CollisionShape2D\").global_rotation =0
+			DrawLines(path)
+			Move = position.direction_to(path[1])*speed
+			
+			move_and_slide(Move)
 
+func DrawLines(path):
+	$Line2D.global_rotation=0
+	$Line2D.clear_points()
+	$Line2D2.global_rotation=0
+	$Line2D2.clear_points()
+	for i in path:
+		$Line2D.add_point(i-position)
+	$Line2D2.add_point(path[0]-position)
+	$Line2D2.add_point(path[1]-position)
+	$RichTextLabel.text = str(round(position.distance_to(path[1])))
+
+
+func findPath():
+	path = nav.callPath([position,target.position])
+	NeedsToCheck = false
+	$FollowTimer.start(3)
+
+func _on_FollowTimer_timeout():
+	NeedsToCheck =true
+	pass # Replace with function body.
+
+
+
+
+func _on_Area2D_body_entered(body):
+	#print(body.name)
+	pass # Replace with function body.
 "
 
-[sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 26.669, 24.7893 )
+[sub_resource type="CapsuleShape2D" id=2]
+radius = 30.0718
+height = 0.574188
 
 [sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 13.6511, 22.9298 )
@@ -108,6 +153,8 @@ func _process(delta):
 [node name="enemy" type="KinematicBody2D" groups=[
 "Zombie",
 ]]
+collision_layer = 8
+collision_mask = 15
 script = SubResource( 1 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -115,24 +162,19 @@ position = Vector2( 5.27044, 2.3717 )
 shape = SubResource( 2 )
 
 [node name="Area2D" type="Area2D" parent="."]
+monitorable = false
+collision_layer = 0
+collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2( 41.7389, 2.56656 )
 shape = SubResource( 3 )
+one_way_collision_margin = 0.0
 
 [node name="Timer" type="Timer" parent="."]
 wait_time = 0.2
 one_shot = true
 autostart = true
-
-[node name="RichTextLabel" type="RichTextLabel" parent="."]
-visible = false
-margin_left = -20.0
-margin_top = -21.0
-margin_right = 20.0
-margin_bottom = 19.0
-size_flags_horizontal = 2
-size_flags_vertical = 2
 
 [node name="Timer 2" type="Timer" parent="."]
 wait_time = 3.0
@@ -151,7 +193,7 @@ shape = SubResource( 4 )
 position = Vector2( 0.948341, -1.84465 )
 scale = Vector2( 2, 2 )
 frames = SubResource( 5 )
-frame = 3
+frame = 2
 playing = true
 
 [node name="ColorRect" type="ColorRect" parent="."]
@@ -172,4 +214,28 @@ margin_bottom = 40.0
 color = Color( 1, 0.680939, 0.00390625, 1 )
 script = SubResource( 6 )
 
-[node name="Navigation2D" type="Navigation2D" parent="."]
+[node name="Line2D" type="Line2D" parent="."]
+visible = false
+
+[node name="Line2D2" type="Line2D" parent="."]
+visible = false
+default_color = Color( 1, 0.4, 0.4, 1 )
+
+[node name="FollowTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+visible = false
+margin_left = -20.0
+margin_top = -21.0
+margin_right = 20.0
+margin_bottom = 19.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]
+[connection signal="timeout" from="FollowTimer" to="." method="_on_FollowTimer_timeout"]

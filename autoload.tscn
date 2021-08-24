@@ -26,12 +26,12 @@ func load_save():
     var savegame = File.new()
     if !savegame.file_exists(\"user://savegame.save\"):
         return
-    var currentline = {}
+    #var currentline = {}
     savegame.open(\"user://savegame.save\", File.READ)
     var data = parse_json( savegame.get_as_text() )
     set_data( data )
     savegame.close()
-    OS.get_screen_size()
+    #OS.get_screen_size()
     pass
 func set_data( data ):
 	Record_time = data.Record_time
@@ -49,10 +49,13 @@ func save():
 	return dict
 	pass
 	
-func _process(delta):
+func _process(_delta):
 	get_node(\"CanvasLayer/RichTextLabel\").bbcode_text =\"Static Memory:\"+ str(float(Performance.get_monitor(Performance.MEMORY_STATIC)/1048576))
 	get_node(\"CanvasLayer/RichTextLabel\").newline()
 	get_node(\"CanvasLayer/RichTextLabel\").add_text(\"FPS:\"+str(Performance.get_monitor(Performance.TIME_FPS)))
+	get_node(\"CanvasLayer/RichTextLabel\").newline()
+	get_node(\"CanvasLayer/RichTextLabel\").add_text(\"TPF:\"+str(Performance.get_monitor(Performance.TIME_PROCESS)))
+
 "
 
 [sub_resource type="CircleShape2D" id=2]
